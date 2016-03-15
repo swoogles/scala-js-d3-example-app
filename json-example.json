@@ -1,0 +1,14 @@
+{ "root": [
+  {
+    "name": "one",
+    "color": "blue"
+  },
+  {
+    "name": "two",
+    "color": "red"
+  },
+  {
+    "name": "three",
+    "color": "green"
+  }
+]}
