@@ -2,6 +2,7 @@ package example
 
 import org.singlespaced.d3js.Ops._
 import org.singlespaced.d3js.d3
+import org.singlespaced.d3js.histogramModule.Bin
 
 import scala.scalajs.js
 
@@ -9,44 +10,66 @@ object ScalaJSExample extends js.JSApp {
 
   def main(): Unit = {
     /**
-      * Adapted from http://thecodingtutorials.blogspot.ch/2012/07/introduction-to-d3.html
+      * Adapted from https://bl.ocks.org/mbostock/3048450
       */
-    val graphHeight = 450
 
-    //The width of each bar.
-    val barWidth = 80
+    // Generate a Bates distribution of 10 random variables.
+    val batsFun = d3.random.bates(10)
+    val values= d3.range(1000).map( _ => batsFun.apply())
 
-    //The distance between each bar.
-    val barSeparation = 10
+    // A formatter for counts.
+    val formatCount = d3.format(",.0f")
 
-    //The maximum value of the data.
-    val maxData = 50
+    case class Margin(top:Int,right:Int,bottom:Int,left:Int)
+    val margin = Margin(top=10,right=30,bottom=30,left=30)
+    val width = 960 - margin.left - margin.right
+    val height = 500 - margin.top - margin.bottom
 
-    //The actual horizontal distance from drawing one bar rectangle to drawing the next.
-    val horizontalBarDistance = barWidth + barSeparation
+    val x = d3.scale.linear()
+      .domain(js.Array(0, 1))
+      .range(js.Array(0, width))
 
-    //The value to multiply each bar's value by to get its height.
-    val barHeightMultiplier = graphHeight / maxData;
+    // Generate a histogram using twenty uniformly-spaced bins.
+    val data: js.Array[Bin[Double]] = d3.layout.histogram()
+      .bins(x.ticks(20))(values)
 
-    //Color for start
-    val c = d3.rgb("DarkSlateBlue")
+    val mm:js.Function2[Bin[Double],Double,Double] = (x: Bin[Double], y: Double) => x.y
 
-    val rectXFun = (d: Int, i: Int) => i * horizontalBarDistance
-    val rectYFun = (d: Int) => graphHeight - d * barHeightMultiplier
-    val rectHeightFun = (d: Int) => d * barHeightMultiplier
-    val rectColorFun = (d: Int, i: Int) => c.brighter(i * 0.5).toString
+    val y = d3.scale.linear()
+      .domain(js.Array(0, d3.max(data, mm)))
+      .range(js.Array(height, 0))
 
-    val svg = d3.select("body").append("svg").attr("width", "100%").attr("height", "450px")
-    val sel = svg.selectAll("rect").data(js.Array(8, 22, 31, 36, 48, 17, 25))
-    sel.enter()
-      .append("rect")
-      .attr("x", rectXFun)
-      .attr("y", rectYFun)
-      .attr("width", barWidth)
-      .attr("height", rectHeightFun)
-      .style("fill", rectColorFun)
+    val xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom")
 
+    val svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
-  }
+    val bar = svg.selectAll(".bar")
+      .data(data)
+      .enter().append("g")
+      .attr("class", "bar")
+      .attr("transform", (d:Bin[Double]) => "translate(" + x(d.x) + "," + y(d.y) + ")" )
+
+    bar.append("rect")
+      .attr("x", 1)
+      .attr("width", x(data(0).dx) - 1)
+      .attr("height", (d:Bin[Double]) => height - y(d.y))
+
+    bar.append("text")
+      .attr("dy", ".75em")
+      .attr("y", 6)
+      .attr("x", x(data(0).dx) / 2)
+      .attr("text-anchor", "middle")
+      .text((d:Bin[Double]) => formatCount(d.y))
+
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);  }
 
 }
