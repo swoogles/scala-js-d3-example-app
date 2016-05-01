@@ -57,11 +57,12 @@ trait D3DemoTrait extends TreeData {
       .style("stroke-width", 5)
     // .attr("d", ()=>"M180,373.75C270,373.75 270,345 360,345") // This is the actual value I want. The line is drawn if I pass the hard-coded value.
 
-     .attr("d", (value: Link[Node], x: Int,y:  js.UndefOr[Int]) => {
-       diagonal(value, 100.0)
-       "blah": Primitive
-     })
+//     .attr("d", (value: Link[Node], x: Int,y:  js.UndefOr[Int]) => {
+//       diagonal(value, 100.0)
+//       "blah": Primitive
+//     })
 
+    println("Finished Diagonal section.")
   }
 
 }
