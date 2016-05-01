@@ -2,6 +2,7 @@ package example
 
 import org.singlespaced.d3js.Ops._
 import org.singlespaced.d3js.d3
+import bill.d3.D3Demos
 
 import scala.scalajs.js
 
@@ -47,6 +48,9 @@ object ScalaJSExample extends js.JSApp {
       .style("fill", rectColorFun)
 
 
+    D3Demos.drawDiagonal
   }
 
 }
+
+
