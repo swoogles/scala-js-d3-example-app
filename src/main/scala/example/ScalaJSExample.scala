@@ -1,55 +1,80 @@
 package example
 
-import org.singlespaced.d3js.Ops._
-import org.singlespaced.d3js.d3
-import bill.d3.D3Demos
-
+import bill.d3.TreeData
 import scala.scalajs.js
+import scala.scalajs.js.Dynamic
+import org.singlespaced.d3js.{Link, Tree, d3}
+import org.singlespaced.d3js.d3.Primitive
 
-object ScalaJSExample extends js.JSApp {
+@js.native
+trait AnimalNode extends js.Object {
+  val parent: String = js.native
+  val name: String = js.native
+  val children: js.Array[AnimalNode] = js.native
+}
 
-  def main(): Unit = {
-    /**
-      * Adapted from http://thecodingtutorials.blogspot.ch/2012/07/introduction-to-d3.html
-      */
-    val graphHeight = 450
+object ScalaJSExample extends js.JSApp with TreeData {
 
-    //The width of each bar.
-    val barWidth = 80
+  def main(): Unit =
+    d3.json("json-example.json", (error: js.Any, json: js.Any) => {
 
-    //The distance between each bar.
-    val barSeparation = 10
+      val jsonTypedFromFile = json.asInstanceOf[AnimalNode]
 
-    //The maximum value of the data.
-    val maxData = 50
+      val width = 960.0
+      val height = 500.0
 
-    //The actual horizontal distance from drawing one bar rectangle to drawing the next.
-    val horizontalBarDistance = barWidth + barSeparation
+      val svg = d3.select("#tree").append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
 
-    //The value to multiply each bar's value by to get its height.
-    val barHeightMultiplier = graphHeight / maxData;
+      val tupledDimensions = (width, height)
 
-    //Color for start
-    val c = d3.rgb("DarkSlateBlue")
+      val dynamicTree: Tree[Dynamic] = d3.layout.tree().size(tupledDimensions)
+      val animalNodeTree: Tree[AnimalNode] = d3.layout.tree().size(tupledDimensions)
 
-    val rectXFun = (d: Int, i: Int) => i * horizontalBarDistance
-    val rectYFun = (d: Int) => graphHeight - d * barHeightMultiplier
-    val rectHeightFun = (d: Int) => d * barHeightMultiplier
-    val rectColorFun = (d: Int, i: Int) => c.brighter(i * 0.5).toString
+      val dynamicNodes = dynamicTree.nodes(jsonDynamicFromTrait)
+      val animalNodes = animalNodeTree.nodes(jsonTypedFromFile)
 
-    val svg = d3.select("body").append("svg").attr("width", "100%").attr("height", "450px")
-    val sel = svg.selectAll("rect").data(js.Array(8, 22, 31, 36, 48, 17, 25))
-    sel.enter()
-      .append("rect")
-      .attr("x", rectXFun)
-      .attr("y", rectYFun)
-      .attr("width", barWidth)
-      .attr("height", rectHeightFun)
-      .style("fill", rectColorFun)
+      val dynamicLinks = dynamicTree.links(dynamicNodes)
+      val animalNodeLinks = animalNodeTree.links(animalNodes)
+      val hardcodedSampleCurve = "M180,373.75C270,373.75 270,345 360,345": Primitive
 
+      svg
+        .append("path")
+        .attr("class", "link")
+        .style("stroke-width", 5)
+        .attr("d", hardcodedSampleCurve) // The line is drawn if I pass the hard-coded value.
 
-    D3Demos.drawDiagonal
-  }
+      svg // Approach #1
+        .data(dynamicLinks)
+        .append("path")
+        .attr("class", "link")
+        .style("stroke-width", 5)
+        .attr("d", (myJson: Link[Dynamic], x: Int, y: js.UndefOr[Int]) => {
+          // TODO Draw the line between source and target
+          hardcodedSampleCurve // This is never reached.
+        })
+
+      svg // Approach #2
+        .data(animalNodeLinks)
+        .append("path")
+        .attr("class", "link")
+        .style("stroke-width", 5)
+        .attr("d", (myJson: Link[AnimalNode], x: Int, y: js.UndefOr[Int]) => {
+          // TODO Draw the line between source and target
+          hardcodedSampleCurve // This is never reached.
+        })
+
+      // Approach #3
+      // Something that would get me to this point with the right types to use this signature
+      // .attr("d", (myJson: Link[Node], x: Int, y: js.UndefOr[Int]) => { ... }
+
+      val diagonal = d3.svg.diagonal() // Ultimately I want to draw Diagonals across all the links.
+
+      println("Finished without drawing any real paths.")
+    }
+    )
 
 }
 

@@ -1,66 +1,44 @@
-{ "name": "master group",
+{
+  "name": "Animal",
   "children": [
-  {
-    "parent" : "master group",
-    "name": "one",
-    "color": "blue",
-    "group": "vertebrates",
-    "children": [
-      {
-        "parent": "one",
-        "name": "Mammals",
-        "group": "Mammals",
-        "color": "blue",
-        "children": []
-      },
-      { "name": "Fish",
-        "parent": "one",
-        "group": "Fish",
-        "color": "blue",
-        "children" : []
-      }
-    ]
-  },
-  {
-    "parent" : "master group",
-    "name": "two",
-    "color": "red",
-    "group": "invertebrates",
-    "children": [
-      {
-        "name": "Mammals",
-        "parent": "two",
-        "group": "Mammals",
-        "color": "blue",
-        "children": []
-      },
-      { "name": "Fish",
-        "parent": "two",
-        "group": "Fish",
-        "color": "blue",
-        "children" : []
-      }
-    ]
-  },
-  {
-    "parent" : "master group",
-    "name": "three",
-    "color": "green",
-    "group": "group3",
-    "children": [
-      {
-        "name": "Mammals",
-        "parent": "three",
-        "group": "Mammals",
-        "color": "blue",
-        "children": []
-      },
-      { "name": "Fish",
-        "parent": "three",
-        "group": "Fish",
-        "color": "blue",
-        "children" : []
-      }
-    ]
-  }
-]}
+    {
+      "name": "Vertebrates",
+      "parent": "Animal",
+      "children": [
+        {
+          "name": "Mammals",
+          "children": [
+            {
+              "name": "Canine",
+              "parent": "Mammals"
+            },
+            {
+              "name": "Primate" ,
+              "parent": "Mammals"
+            }
+          ]
+        },
+        {
+          "name": "Birds",
+          "parent": "Vertebrates"
+        }
+      ]
+    },
+    {
+      "name": "Invertebrates",
+      "parent": "Animal",
+      "children": [
+        {
+          "parent" :"Invertebrates",
+          "name": "Jellyfish"
+        },
+        {
+          "parent" :"Invertebrates",
+          "name": "Worms"
+        }
+
+      ]
+    }
+  ]
+}
+
