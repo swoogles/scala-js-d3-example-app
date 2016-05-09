@@ -53,4 +53,3 @@ object ScalaJSExample extends js.JSApp {
 
 }
 
-
